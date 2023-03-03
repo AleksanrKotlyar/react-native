@@ -25,9 +25,12 @@ export default function Home({ navigation, route }) {
 				},
 				tabBarShowLabel: false,
 				tabBarStyle: { paddingLeft: 50, paddingRight: 50, height: 83 },
+				tabBarActiveTintColor: "#FF6C00",
+				tabBarInactiveTintColor: "rgba(33, 33, 33, 0.8)",
 			}}
 		>
 			<MainTabs.Screen
+				screenOptions={{ borderTopWidth: 1 }}
 				options={{
 					headerShown: true,
 					title: "Публикации",
@@ -38,6 +41,7 @@ export default function Home({ navigation, route }) {
 						fontSize: 17,
 						lineHeight: 22,
 					},
+
 					tabBarIcon: ({ focused, size, color }) => (
 						<Feather name="grid" size={24} color={color} />
 					),
@@ -59,8 +63,20 @@ export default function Home({ navigation, route }) {
 						fontSize: 17,
 					},
 					tabBarIcon: ({ focused, size, color }) => (
-						<View style={style.btnCont}>
-							<Feather name="plus" style={style.addBtnText} />
+						<View
+							style={{
+								...style.btnCont,
+								backgroundColor: focused ? "#FF6C00" : "#FFF",
+								borderColor: focused ? "transparent" : "rgba(33, 33, 33, 0.8)",
+							}}
+						>
+							<Feather
+								name="plus"
+								style={{
+									...style.addBtnText,
+									color: focused ? "#FFF" : "rgba(33, 33, 33, 0.8)",
+								}}
+							/>
 						</View>
 					),
 				}}
@@ -88,11 +104,11 @@ const style = StyleSheet.create({
 		width: 70,
 		height: 40,
 		borderRadius: 20,
-		backgroundColor: "#FF6C00",
+		// backgroundColor: "#FFF",
+		borderWidth: 1,
 	},
 	addBtnText: {
 		fontSize: 25,
-		color: "#ffffff",
 		fontWeight: "100",
 	},
 });
