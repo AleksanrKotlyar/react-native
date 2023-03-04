@@ -1,6 +1,5 @@
 import {
 	Text,
-	Button,
 	Image,
 	View,
 	StyleSheet,
@@ -15,13 +14,7 @@ import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 
-import {
-	MaterialIcons,
-	Feather,
-	AntDesign,
-	Ionicons,
-	Octicons,
-} from "@expo/vector-icons";
+import { MaterialIcons, Feather, Octicons } from "@expo/vector-icons";
 
 export default function CreatePostsScreen({ navigation }) {
 	const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -100,45 +93,41 @@ export default function CreatePostsScreen({ navigation }) {
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<View style={style.cont}>
+				{isShowCamera ? (
+					<View style={style.camera}>
+						{photo && <Image style={style.photoImg} source={{ uri: photo }} />}
+						<TouchableOpacity
+							onPress={() => setIsShowCamera(false)}
+							style={{
+								...style.btnCont,
+								backgroundColor: photo ? "rgba(255, 255, 255, 0.3)" : "#FFF",
+							}}
+						>
+							<MaterialIcons
+								name="photo-camera"
+								size={24}
+								color={photo ? "#FFF" : "#BDBDBD"}
+							/>
+						</TouchableOpacity>
+					</View>
+				) : (
+					<Camera style={style.camera} ref={setCamera}>
+						<TouchableOpacity
+							onPress={() => {
+								takePhoto();
+							}}
+							style={style.btnCont}
+						>
+							<MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
+						</TouchableOpacity>
+					</Camera>
+				)}
+				<Text style={style.underCameraText}>
+					{photo ? "Редактировать фото" : "Загрузите фото"}
+				</Text>
 				<KeyboardAvoidingView
 					behavior={Platform.OS == "ios" ? "padding" : "height"}
-					keyboardVerticalOffset={150}
 				>
-					{isShowCamera ? (
-						<View style={style.camera}>
-							{photo && (
-								<Image style={style.photoImg} source={{ uri: photo }} />
-							)}
-							<TouchableOpacity
-								onPress={() => setIsShowCamera(false)}
-								style={{
-									...style.btnCont,
-									backgroundColor: photo ? "rgba(255, 255, 255, 0.3)" : "#FFF",
-								}}
-							>
-								<MaterialIcons
-									name="photo-camera"
-									size={24}
-									color={photo ? "#FFF" : "#BDBDBD"}
-								/>
-							</TouchableOpacity>
-						</View>
-					) : (
-						<Camera style={style.camera} ref={setCamera}>
-							<TouchableOpacity
-								onPress={() => {
-									takePhoto();
-								}}
-								style={style.btnCont}
-							>
-								<MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-							</TouchableOpacity>
-						</Camera>
-					)}
-					<Text style={style.underCameraText}>
-						{photo ? "Редактировать фото" : "Загрузите фото"}
-					</Text>
-
 					<TextInput
 						style={style.postDescr}
 						value={postDescr}
@@ -236,7 +225,6 @@ const style = StyleSheet.create({
 		fontSize: 16,
 	},
 	postDescr: {
-		// flex: 1,
 		borderBottomColor: "#E8E8E8",
 		borderBottomWidth: 1,
 		color: "#000",
@@ -265,7 +253,6 @@ const style = StyleSheet.create({
 		borderRadius: 20,
 	},
 	clearBtnCont: {
-		// flex: 1,
 		justifyContent: "flex-end",
 		alignItems: "center",
 		marginBottom: 32,

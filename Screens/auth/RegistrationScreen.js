@@ -61,7 +61,7 @@ export default function RegistrationScreen({ navigation }) {
 	return (
 		<TouchableWithoutFeedback
 			onPress={() => {
-				Keyboard.dismiss();
+				Keyboard.dismiss;
 				setIsShowKeyboard(false);
 			}}
 		>

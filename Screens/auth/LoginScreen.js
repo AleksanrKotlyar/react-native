@@ -54,7 +54,7 @@ export default function LoginScreen({ navigation }) {
 	return (
 		<TouchableWithoutFeedback
 			onPress={() => {
-				Keyboard.dismiss();
+				Keyboard.dismiss;
 				setIsShowKeyboard(false);
 			}}
 		>
@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		borderWidth: 1,
-
 		height: 50,
 		borderRadius: 6,
 		paddingHorizontal: 16,
