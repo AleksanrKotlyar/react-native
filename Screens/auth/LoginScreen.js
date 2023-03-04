@@ -26,8 +26,6 @@ export default function LoginScreen({ navigation }) {
 	const [isOnFocus, setOnFocus] = useState(focusState);
 	const [dimWidth, setDimWidth] = useState(Dimensions.get("window").width);
 	const [dimHeight, setDimHeight] = useState(Dimensions.get("window").height);
-	console.log("dimWidth", dimWidth);
-	console.log("Height", dimHeight);
 
 	useEffect(() => {
 		const onChange = () => {

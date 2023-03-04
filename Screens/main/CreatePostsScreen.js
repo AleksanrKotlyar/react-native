@@ -23,14 +23,13 @@ import {
 	Octicons,
 } from "@expo/vector-icons";
 
-const CreatePostsScreen = ({ navigation }) => {
+export default function CreatePostsScreen({ navigation }) {
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 
 	const [errorMsg, setErrorMsg] = useState(null);
 	const [locatPos, setLocatPos] = useState({});
 	const [camera, setCamera] = useState(null);
 	const [photo, setPhoto] = useState(null);
-
 	// const [hasPermission, setHasPermission] = useState(null);
 	const [postDescr, setPostDescr] = useState("");
 	const isReadyToPubl = postDescr && photo;
@@ -88,73 +87,84 @@ const CreatePostsScreen = ({ navigation }) => {
 
 	const onPublishHandle = async () => {
 		if (isReadyToPubl) {
-			navigation.navigate("Posts", {
-				screen: "DefaultPosts",
+			navigation.navigate("DefaultPosts", {
+				photo,
+				locatPos,
+				postDescr,
 			});
+
+			cleanData();
 		}
-		cleanData();
 	};
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<View style={style.cont}>
-				{isShowCamera ? (
-					<View style={style.camera}>
-						{photo && <Image style={style.photoImg} source={{ uri: photo }} />}
-						<TouchableOpacity
-							onPress={() => setIsShowCamera(false)}
+				<KeyboardAvoidingView
+					behavior={Platform.OS == "ios" ? "padding" : "height"}
+					keyboardVerticalOffset={150}
+				>
+					{isShowCamera ? (
+						<View style={style.camera}>
+							{photo && (
+								<Image style={style.photoImg} source={{ uri: photo }} />
+							)}
+							<TouchableOpacity
+								onPress={() => setIsShowCamera(false)}
+								style={{
+									...style.btnCont,
+									backgroundColor: photo ? "rgba(255, 255, 255, 0.3)" : "#FFF",
+								}}
+							>
+								<MaterialIcons
+									name="photo-camera"
+									size={24}
+									color={photo ? "#FFF" : "#BDBDBD"}
+								/>
+							</TouchableOpacity>
+						</View>
+					) : (
+						<Camera style={style.camera} ref={setCamera}>
+							<TouchableOpacity
+								onPress={() => {
+									takePhoto();
+								}}
+								style={style.btnCont}
+							>
+								<MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
+							</TouchableOpacity>
+						</Camera>
+					)}
+					<Text style={style.underCameraText}>
+						{photo ? "Редактировать фото" : "Загрузите фото"}
+					</Text>
+
+					<TextInput
+						style={style.postDescr}
+						value={postDescr}
+						onChangeText={setPostDescr}
+						placeholder="Название..."
+						placeholderTextColor="#BDBDBD"
+					/>
+
+					<View style={style.locatCont}>
+						<Octicons
+							name="location"
+							size={24}
+							color="rgba(189, 189, 189, 1)"
+						/>
+						<Text
 							style={{
-								...style.btnCont,
-								backgroundColor: photo ? "rgba(255, 255, 255, 0.3)" : "#FFF",
+								...style.locatText,
+								color: locatPos.region ? "#212121" : "#BDBDBD",
 							}}
 						>
-							<MaterialIcons
-								name="photo-camera"
-								size={24}
-								color={photo ? "#FFF" : "#BDBDBD"}
-							/>
-						</TouchableOpacity>
+							{locatPos.region && locatPos.country
+								? `${locatPos.region}, ${locatPos.country}`
+								: "Местность..."}
+						</Text>
 					</View>
-				) : (
-					<Camera style={style.camera} ref={setCamera}>
-						<TouchableOpacity
-							onPress={() => {
-								takePhoto();
-							}}
-							style={style.btnCont}
-						>
-							<MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-						</TouchableOpacity>
-					</Camera>
-				)}
-				{/* <KeyboardAvoidingView
-          behavior={Platform.OS == "ios" ? "padding" : "height"}
-        > */}
-				<Text style={style.underCameraText}>
-					{photo ? "Редактировать фото" : "Загрузите фото"}
-				</Text>
-
-				<TextInput
-					style={style.postDescr}
-					value={postDescr}
-					onChangeText={setPostDescr}
-					placeholder="Название"
-				/>
-
-				<View style={style.locatCont}>
-					<Octicons name="location" size={24} color="rgba(189, 189, 189, 1)" />
-					{/* <Text
-						style={{
-							...style.locatText,
-							color: locatPos.region ? "#212121" : "#BDBDBD",
-						}}
-					>
-						{locatPos.region && locatPos.country
-							? `${locatPos.region}, ${locatPos.country}`
-							: "Местность..."}
-					</Text> */}
-				</View>
-				{/* </KeyboardAvoidingView> */}
+				</KeyboardAvoidingView>
 				<TouchableOpacity
 					style={{
 						...style.publBtn,
@@ -162,7 +172,7 @@ const CreatePostsScreen = ({ navigation }) => {
 					}}
 				>
 					<Text
-						onPress={() => onPublishHandle()}
+						onPress={onPublishHandle}
 						style={{
 							...style.publBtnText,
 							color: isReadyToPubl ? "#fff" : "#BDBDBD",
@@ -184,8 +194,7 @@ const CreatePostsScreen = ({ navigation }) => {
 			</View>
 		</TouchableWithoutFeedback>
 	);
-};
-export default CreatePostsScreen;
+}
 
 const style = StyleSheet.create({
 	cont: {
@@ -227,13 +236,14 @@ const style = StyleSheet.create({
 		fontSize: 16,
 	},
 	postDescr: {
-		flex: 1,
+		// flex: 1,
 		borderBottomColor: "#E8E8E8",
 		borderBottomWidth: 1,
 		color: "#000",
 		marginTop: 32,
 		fontFamily: "Roboto-Regular",
 		fontSize: 16,
+		paddingBottom: 15,
 	},
 	publBtn: {
 		justifyContent: "center",
@@ -255,7 +265,7 @@ const style = StyleSheet.create({
 		borderRadius: 20,
 	},
 	clearBtnCont: {
-		flex: 1,
+		// flex: 1,
 		justifyContent: "flex-end",
 		alignItems: "center",
 		marginBottom: 32,

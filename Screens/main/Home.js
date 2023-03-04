@@ -14,7 +14,7 @@ export default function Home({ navigation, route }) {
 
 	return (
 		<MainTabs.Navigator
-			initialRouteName="Posts"
+			// initialRouteName="DefaultPosts"
 			screenOptions={{
 				headerTitleAlign: "center",
 				headerLeftContainerStyle: {
@@ -32,21 +32,9 @@ export default function Home({ navigation, route }) {
 			<MainTabs.Screen
 				screenOptions={{ borderTopWidth: 1 }}
 				options={{
-					headerShown: true,
-					title: "Публикации",
-					headerTitleAlign: "center",
-
-					headerTitleStyle: {
-						fontFamily: "Roboto-Bold",
-						fontSize: 17,
-						lineHeight: 22,
-					},
-
+					headerShown: false,
 					tabBarIcon: ({ focused, size, color }) => (
 						<Feather name="grid" size={24} color={color} />
-					),
-					headerRight: () => (
-						<Entypo name="log-out" size={24} color="#BDBDBD" />
 					),
 				}}
 				name="Posts"
