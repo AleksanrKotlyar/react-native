@@ -4,10 +4,14 @@ import { Entypo, AntDesign } from "@expo/vector-icons";
 import DefaultPostsScreen from "./nestedScreens/DefaultPostsScreen";
 import CommentsScreen from "./nestedScreens/CommentsScreen";
 import MapScreen from "./nestedScreens/MapScreen";
+import { useDispatch } from "react-redux";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 const PostsStack = createStackNavigator();
 
 export default function PostsScreen({ navigation, route }) {
+	const dispatch = useDispatch();
+
 	return (
 		<PostsStack.Navigator
 			initialRouteName="DefaultPosts"
@@ -34,18 +38,15 @@ export default function PostsScreen({ navigation, route }) {
 						fontSize: 17,
 						lineHeight: 22,
 					},
-					headerRight: () => (
-						<Entypo name="log-out" size={24} color="#BDBDBD" />
+
+					headerRight: ({ focused, size, color }) => (
+						<Entypo
+							name="log-out"
+							size={24}
+							color={focused ? "#FF6C00" : "#BDBDBD"}
+							onPress={() => dispatch(authSignOutUser())}
+						/>
 					),
-					// title: "Публикации",
-					// headerRight: () => (
-					// 	<Entypo
-					// 		onPress={() => dispatch(authSignOut())}
-					// 		name="log-out"
-					// 		size={24}
-					// 		color="#BDBDBD"
-					// 	/>
-					// ),
 				}}
 			/>
 			<PostsStack.Screen

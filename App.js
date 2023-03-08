@@ -1,10 +1,11 @@
-// import { StatusBar } from "expo-status-bar";
 import {} from "react-native";
 import React, { useState } from "react";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
-import useRout from "./router";
-import { NavigationContainer } from "@react-navigation/native";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+
+import Main from "./components/Main";
 
 const loadFonts = async () => {
 	await Font.loadAsync({
@@ -16,7 +17,6 @@ const loadFonts = async () => {
 
 export default function App() {
 	const [isReady, setIsReady] = useState(false);
-	const routing = useRout(true);
 
 	if (!isReady) {
 		return (
@@ -28,5 +28,9 @@ export default function App() {
 		);
 	}
 
-	return <NavigationContainer>{routing}</NavigationContainer>;
+	return (
+		<Provider store={store}>
+			<Main />
+		</Provider>
+	);
 }

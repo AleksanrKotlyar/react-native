@@ -13,6 +13,9 @@ import {
 	Dimensions,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSignInUser } from "../../redux/auth/authOperations";
+
 const focusState = {
 	email: null,
 	password: null,
@@ -26,6 +29,8 @@ export default function LoginScreen({ navigation }) {
 	const [isOnFocus, setOnFocus] = useState(focusState);
 	const [dimWidth, setDimWidth] = useState(Dimensions.get("window").width);
 	const [dimHeight, setDimHeight] = useState(Dimensions.get("window").height);
+
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		const onChange = () => {
@@ -41,11 +46,11 @@ export default function LoginScreen({ navigation }) {
 		};
 	}, []);
 
-	const keyboardHide = () => {
+	const handleSubmit = () => {
 		setIsShowKeyboard(false);
 		Keyboard.dismiss();
-		console.log(email, password);
-		setPassword(""), setFocus(focusState);
+		dispatch(authSignInUser({ email, password }));
+		setPassword(""), setOnFocus(focusState);
 	};
 	const pswdVisToggle = () => {
 		setPswdVisible(!pswdVisible);
@@ -130,10 +135,7 @@ export default function LoginScreen({ navigation }) {
 							<TouchableOpacity
 								activeOpacity={0.8}
 								style={styles.btn}
-								onPress={() => {
-									navigation.navigate("Home");
-									keyboardHide;
-								}}
+								onPress={handleSubmit}
 							>
 								<Text style={styles.btnTitle}>Войти</Text>
 							</TouchableOpacity>

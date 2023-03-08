@@ -14,6 +14,8 @@ import {
 	useWindowDimensions,
 	Image,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { authSignUpUser } from "../../redux/auth/authOperations";
 
 const focusState = {
 	login: false,
@@ -22,9 +24,11 @@ const focusState = {
 };
 
 export default function RegistrationScreen({ navigation }) {
-	const [isShowKeyboard, setIsShowKeyboard] = useState(false);
 	const { width } = useWindowDimensions();
 
+	const dispatch = useDispatch();
+
+	const [isShowKeyboard, setIsShowKeyboard] = useState(false);
 	const [login, setLogin] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -47,13 +51,15 @@ export default function RegistrationScreen({ navigation }) {
 		};
 	}, []);
 
-	const keyboardHide = () => {
+	const handleSubmit = () => {
 		setIsShowKeyboard(false);
 		Keyboard.dismiss();
-		console.log(login, email, password);
+
+		dispatch(authSignUpUser({ login, email, password }));
 		setLogin(""), setPassword(""), setEmail("");
 		setOnFocus(focusState);
 	};
+
 	const pswdVisToggle = () => {
 		setPswdVisible(!pswdVisible);
 	};
@@ -168,10 +174,7 @@ export default function RegistrationScreen({ navigation }) {
 							<TouchableOpacity
 								activeOpacity={0.8}
 								style={styles.btn}
-								onPress={() => {
-									navigation.navigate("Home");
-									keyboardHide;
-								}}
+								onPress={handleSubmit}
 							>
 								<Text style={styles.btnTitle}>Зарегестрироваться</Text>
 							</TouchableOpacity>
