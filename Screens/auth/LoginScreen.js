@@ -91,6 +91,7 @@ export default function LoginScreen({ navigation }) {
 									placeholder="Адрес электронной почты"
 									inputMode="email"
 									placeholderTextColor="#BDBDBD"
+									keyboardType="email-address"
 									onFocus={() => {
 										setIsShowKeyboard(true);
 										setOnFocus({ email: true });

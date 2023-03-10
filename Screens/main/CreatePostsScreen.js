@@ -13,8 +13,13 @@ import {
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import { MaterialIcons, Feather, Octicons } from "@expo/vector-icons";
+import { collection, addDoc } from "firebase/firestore";
+import { storage, db } from "../../firebase/config";
+// import db  from "../../firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function CreatePostsScreen({ navigation }) {
 	const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -27,6 +32,7 @@ export default function CreatePostsScreen({ navigation }) {
 	const [postDescr, setPostDescr] = useState("");
 	const isReadyToPubl = postDescr && photo;
 	const [isShowCamera, setIsShowCamera] = useState(true);
+	const { userId, nickName } = useSelector((state) => state.auth);
 
 	useEffect(() => {
 		// (async () => {
@@ -43,6 +49,20 @@ export default function CreatePostsScreen({ navigation }) {
 				setErrorMsg("Permission to access location was denied");
 				return;
 			}
+			let { coords } = await Location.getCurrentPositionAsync();
+			let place = await Location.reverseGeocodeAsync({
+				latitude: coords.latitude,
+				longitude: coords.longitude,
+			});
+			console.log("place", place);
+
+			let positionData = {
+				latitude: coords.latitude,
+				longitude: coords.longitude,
+				region: place[0].region,
+				country: place[0].country,
+			};
+			setLocatPos(positionData);
 		})();
 	}, []);
 
@@ -54,13 +74,14 @@ export default function CreatePostsScreen({ navigation }) {
 	// }
 
 	const takePhoto = async () => {
-		const snap = await camera.takePictureAsync();
-		setPhoto(snap.uri);
+		const { uri } = await camera.takePictureAsync();
+		setPhoto(uri);
 		let { coords } = await Location.getCurrentPositionAsync();
 		let place = await Location.reverseGeocodeAsync({
 			latitude: coords.latitude,
 			longitude: coords.longitude,
 		});
+		console.log("place", place);
 
 		let positionData = {
 			latitude: coords.latitude,
@@ -75,19 +96,55 @@ export default function CreatePostsScreen({ navigation }) {
 	const cleanData = () => {
 		setPhoto(null);
 		setLocatPos({});
-		setPostDescr(null);
+		setPostDescr("");
 	};
 
 	const onPublishHandle = async () => {
+		const downloadURl = await uploadPhotoToServer();
+
+		const docRef = await addDoc(collection(db, "posts"), {
+			downloadURl,
+			postDescription: postDescr,
+			location: locatPos,
+			userId,
+			nickName,
+			likes: [],
+		});
+
 		if (isReadyToPubl) {
-			navigation.navigate("DefaultPosts", {
-				photo,
-				locatPos,
-				postDescr,
-			});
+			navigation.navigate("DefaultPosts");
 
 			cleanData();
 		}
+	};
+
+	// const uploadPostToServer = async () => {
+
+	// 	const createPost = await db
+	// 		.firestore()
+	// 		.collection("posts")
+	// 		.add({ photo, comment, location: location.coords, userId, nickName });
+	// };
+
+	const uploadPhotoToServer = async () => {
+		const response = await fetch(photo);
+		const file = await response.blob();
+		const uniquePostId = Date.now().toString();
+		const photoRef = ref(storage, `postImage/${uniquePostId}`);
+		await uploadBytes(photoRef, file);
+		const downloadURL = await getDownloadURL(photoRef);
+		return downloadURL;
+		// const response = await fetch(photo);
+		// const file = await response.blob();
+		// const uniquePostId = Date.now().toString();
+		// await db.storage().ref(`postImage/${uniquePostId}`).put(file);
+
+		// const processedPhoto = await db
+		// 	.storage()
+		// 	.ref("postImage")
+		// 	.child(uniquePostId)
+		// 	.getDownloadURL();
+		// return processedPhoto;
 	};
 
 	return (

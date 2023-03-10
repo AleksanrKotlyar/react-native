@@ -9,15 +9,42 @@ import {
 	TouchableOpacity,
 } from "react-native";
 import { EvilIcons, Feather } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
+
+import { db } from "../../../firebase/config";
+import {
+	collection,
+	getDocs,
+	setDoc,
+	doc,
+	onSnapshot,
+} from "firebase/firestore";
 
 export default function DefaultPostsScreen({ route, navigation }) {
 	const [posts, setPosts] = useState([]);
 
+	const { name, email, avatURL, userId } = useSelector((state) => state.auth);
+
+	const getAllPosts = async () => {
+		await onSnapshot(collection(db, "posts"), (querySnapshot) => {
+			setPosts([]);
+			querySnapshot.forEach((doc) =>
+				setPosts((prevState) => [...prevState, { ...doc.data(), id: doc.id }])
+			);
+		});
+		// await db
+		// 	.firestore()
+		// 	.collection("posts")
+		// 	.onSnapshot((data) =>
+		// 		setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+		// 	);
+	};
+
 	useEffect(() => {
-		if (route.params) {
-			setPosts((prevState) => [...prevState, route.params]);
-		}
-	}, [route.params]);
+		getAllPosts();
+	}, []);
+
+	if (!posts) return;
 
 	return (
 		<View style={styles.container}>
@@ -35,88 +62,64 @@ export default function DefaultPostsScreen({ route, navigation }) {
 				</View>
 			</TouchableOpacity>
 
-			<FlatList
-				data={posts}
-				style={styles.list}
-				keyExtractor={(item, indx) => indx.toString()}
-				renderItem={({ item }) => (
-					<View>
-						<Image source={{ uri: item.photo }} style={styles.poster} />
-						<Text style={styles.postTitle}>{item.postDescr}</Text>
+			{posts.length > 0 && (
+				<FlatList
+					data={posts}
+					style={styles.list}
+					keyExtractor={(item, indx) => indx.toString()}
+					renderItem={({ item }) => (
+						<View>
+							<Image source={{ uri: item.downloadURl }} style={styles.poster} />
+							<Text style={styles.postTitle}>{item.postDescription}</Text>
 
-						<View style={styles.postDescription}>
-							<EvilIcons
-								name="comment"
-								size={24}
-								color="gray"
-								style={styles.commentIcon}
-								onPress={() => navigation.navigate("Comments", {})}
-							/>
-
-							<TouchableOpacity
-								style={styles.locationContainer}
-								onPress={() =>
-									navigation.navigate("Map", {
-										locatPos: item.locatPos,
-										postDescr: item.postDescr,
-									})
-								}
-							>
-								<EvilIcons name="location" size={24} color="gray" />
-								<Text>
-									{`${item.locatPos.region}, ${item.locatPos.country}`}
-								</Text>
-							</TouchableOpacity>
+							<View style={styles.postDescription}>
+								<EvilIcons
+									name="comment"
+									size={24}
+									color="gray"
+									style={styles.commentIcon}
+									onPress={() =>
+										navigation.navigate("Comments", {
+											postId: item.id,
+											uri: item.downloadURl,
+										})
+									}
+								/>
+								<TouchableOpacity
+									style={styles.locationContainer}
+									onPress={() => {
+										if (Object.keys(item.location).length > 0) {
+											navigation.navigate("Map", {
+												location: item.location,
+												postDescr: item.postDescription,
+											});
+										}
+										return;
+									}}
+								>
+									<EvilIcons name="location" size={24} color="gray" />
+									<Text>
+										{Object.keys(item.location).length > 0
+											? `${item.location.region}, ${item.location.country}`
+											: "Местоположение не указано"}
+									</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
-					</View>
-				)}
-			/>
+					)}
+				/>
+			)}
 		</View>
-		// <View style={styles.container}>
-		// 	<FlatList
-		// 		data={posts}
-		// 		keyExtractor={(item, indx) => indx.toString()}
-		// 		renderItem={({ item }) => (
-		// 			<View
-		// 				style={{
-		// 					marginBottom: 10,
-		// 					justifyContent: "center",
-		// 					alignItems: "center",
-		// 				}}
-		// 			>
-		// 				<Image
-		// 					source={{ uri: item.photo }}
-		// 					style={{ width: 350, height: 200 }}
-		// 				/>
-		// 			</View>
-		// 		)}
-		// 	/>
-		// 	<Button
-		// 		title="go to map"
-		// 		onPress={() => navigation.navigate("Map", posts)}
-		// 	/>
-		// 	<Button
-		// 		title="go to Comments"
-		// 		onPress={() => navigation.navigate("Comments")}
-		// 	/>
-		// </View>
 	);
 }
-
-// const styles = StyleSheet.create({
-// 	container: {
-// 		flex: 1,
-// 		justifyContent: "center",
-// 		borderTopWidth: 1,
-// 		borderTopColor: "rgba(33, 33, 33, 0.3)",
-// 	},
-// });
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		//justifyContent: "center",
+		// justifyContent: "center",
 		alignItems: "center",
+		borderTopWidth: 1,
+		borderTopColor: "rgba(33, 33, 33, 0.3)",
 	},
 	poster: {
 		width: 343,
@@ -158,20 +161,23 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 	},
 	profileDescrBox: {
-		flex: 1,
+		// flex: 1,
 	},
 	profileDescr: {
 		fontSize: 16,
 		weight: "bold",
 	},
 	innerCont: {
-		flex: 2,
-		position: "absolute",
-		minHeight: 100,
+		// flex: 2,
+		// position: "absolute",
+		// minHeight: 100,
+
 		flexDirection: "row",
-		padding: 20,
+		// padding: 20,
+		marginVertical: 32,
+		padding: 16,
 	},
 	list: {
-		marginTop: 60,
+		// marginTop: 60,
 	},
 });

@@ -11,7 +11,7 @@ import { Feather, AntDesign } from "@expo/vector-icons";
 export default function MapScreen({ navigation, route }) {
 	const {
 		postDescr,
-		locatPos: { latitude, longitude },
+		location: { latitude, longitude },
 	} = route.params;
 	if (!route.params) {
 		Alert.alert("There`s no location point here! Try another post!");
@@ -39,7 +39,7 @@ export default function MapScreen({ navigation, route }) {
 				<Marker
 					title={postDescr}
 					coordinate={{ latitude, longitude }}
-					description="Hi"
+					description="Here you are"
 				/>
 			</MapView>
 		</View>
