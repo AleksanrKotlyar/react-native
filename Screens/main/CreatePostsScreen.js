@@ -54,7 +54,6 @@ export default function CreatePostsScreen({ navigation }) {
 				latitude: coords.latitude,
 				longitude: coords.longitude,
 			});
-			console.log("place", place);
 
 			let positionData = {
 				latitude: coords.latitude,

@@ -47,6 +47,7 @@ export const authSignUpUser =
 				updateUserProfile({
 					nickName: displayName,
 					userId: uid,
+					email,
 				})
 			);
 		} catch (error) {
@@ -108,6 +109,7 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 			const userUpdateProfile = {
 				nickName: user.displayName,
 				userId: user.uid,
+				email: user.email,
 			};
 			dispatch(updateUserProfile(userUpdateProfile));
 			dispatch(authStateChange({ stateChange: true }));

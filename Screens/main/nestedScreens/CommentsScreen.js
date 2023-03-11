@@ -16,13 +16,9 @@ import { useSelector } from "react-redux";
 
 export default function CommentsScreen({ navigation, route }) {
 	const { postId } = route.params;
-
 	const [comment, setComment] = useState("");
-	console.log("comment", comment);
 	const [allComments, setAllComments] = useState([]);
-	console.log("allComments", allComments);
 	const { nickName } = useSelector((state) => state.auth);
-
 	const { uri } = route.params;
 
 	useEffect(() => {
@@ -32,8 +28,8 @@ export default function CommentsScreen({ navigation, route }) {
 	const createPost = async () => {
 		if (comment) {
 			const date = new Date();
-			const commentDate = date.toLocaleDateString("en-US");
-			console.log("commentDate", commentDate);
+			const commentDate =
+				date.toLocaleDateString() + " " + date.toLocaleTimeString();
 
 			const commentValue = {
 				text: comment,
@@ -60,7 +56,6 @@ export default function CommentsScreen({ navigation, route }) {
 		await onSnapshot(doc(db, "posts", postId), (doc) =>
 			setAllComments(doc.data().comments || [])
 		);
-
 		// db.firestore()
 		// 	.collection("posts")
 		// 	.doc(postId)
@@ -75,19 +70,19 @@ export default function CommentsScreen({ navigation, route }) {
 			<View>
 				<Image source={{ uri }} style={styles.poster} />
 			</View>
-			<SafeAreaView style={styles.container}>
-				<FlatList
-					data={allComments}
-					renderItem={({ item }) => (
-						<View style={styles.commentContainer}>
-							<Text style={styles.commentAuthor}>{item.nickName}:</Text>
-							<Text style={styles.commentText}>{item.text}</Text>
-							<Text style={styles.commentText}>{item.date}</Text>
-						</View>
-					)}
-					keyExtractor={(item) => item.id}
-				/>
-			</SafeAreaView>
+			{/* <SafeAreaView style={styles.container}> */}
+			<FlatList
+				data={allComments}
+				renderItem={({ item }) => (
+					<View style={styles.commentContainer}>
+						<Text style={styles.commentAuthor}>{item.nickName}:</Text>
+						<Text style={styles.commentText}>{item.text}</Text>
+						<Text style={styles.commentText}>{item.date}</Text>
+					</View>
+				)}
+				keyExtractor={(item) => item.id}
+			/>
+			{/* </SafeAreaView> */}
 			<View style={styles.inputContainer}>
 				<TextInput
 					style={styles.input}
@@ -95,7 +90,11 @@ export default function CommentsScreen({ navigation, route }) {
 					value={comment}
 				/>
 			</View>
-			<TouchableOpacity onPress={createPost} style={styles.sendBtn}>
+			<TouchableOpacity
+				onPress={createPost}
+				style={styles.sendBtn}
+				activeOpacity={0.8}
+			>
 				<Text style={styles.buttonText}>Comment</Text>
 			</TouchableOpacity>
 		</View>
@@ -105,15 +104,15 @@ export default function CommentsScreen({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "space-between",
-		alignItems: "center",
+		paddingHorizontal: 16,
+		paddingTop: 32,
 	},
 	sendBtn: {
 		paddingTop: 16,
 		paddingBottom: 16,
 		paddingLeft: 32,
 		paddingRight: 32,
-		width: 343,
+		width: "100%",
 		backgroundColor: "#FF6C00",
 		borderRadius: 100,
 		alignItems: "center",
@@ -123,29 +122,23 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: "white",
 	},
-	inputContainer: {
-		marginHorizontal: 10,
-		marginBottom: 20,
-	},
+	inputContainer: {},
 	input: {
-		width: 343,
+		width: "100%",
 		borderBottomWidth: 1,
 		borderColor: "#E8E8E8",
 		fontSize: 16,
 		marginBottom: 22,
 	},
 	poster: {
-		width: 343,
+		width: "100%",
 		height: 240,
-		//backgroundColor: "red",
 		borderColor: "#E8E8E8",
 		borderRadius: 8,
-		margin: 32,
 	},
 	commentAuthor: {
 		fontSize: 18,
-		marginLeft: "auto",
+
 		marginVertical: 8,
 	},
-	// commentText: {},
 });

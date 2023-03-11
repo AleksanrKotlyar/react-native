@@ -23,7 +23,7 @@ import {
 export default function DefaultPostsScreen({ route, navigation }) {
 	const [posts, setPosts] = useState([]);
 
-	const { name, email, avatURL, userId } = useSelector((state) => state.auth);
+	const { nickName, email, userId } = useSelector((state) => state.auth);
 
 	const getAllPosts = async () => {
 		await onSnapshot(collection(db, "posts"), (querySnapshot) => {
@@ -44,21 +44,20 @@ export default function DefaultPostsScreen({ route, navigation }) {
 		getAllPosts();
 	}, []);
 
-	if (!posts) return;
+	// if (!posts) return;
 
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
-				style={styles.innerCont}
+				style={styles.userCont}
 				onPress={() => navigation.navigate("Profile")}
 			>
-				<View style={styles.profileBox}>
+				<View style={styles.photoCont}>
 					<Feather name="user" size={44} color="black" />
 				</View>
-
-				<View style={styles.profileDescrBox}>
-					<Text style={styles.profileDescr}>UserLogin</Text>
-					<Text style={styles.profileDescr}>UserEmail</Text>
+				<View>
+					<Text>{nickName}</Text>
+					<Text>{email}</Text>
 				</View>
 			</TouchableOpacity>
 
@@ -116,13 +115,13 @@ export default function DefaultPostsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		// justifyContent: "center",
-		alignItems: "center",
 		borderTopWidth: 1,
 		borderTopColor: "rgba(33, 33, 33, 0.3)",
+		paddingHorizontal: 16,
+		paddingTop: 32,
 	},
 	poster: {
-		width: 343,
+		width: "100%",
 		height: 240,
 		borderRadius: 8,
 		marginTop: 16,
@@ -134,7 +133,6 @@ const styles = StyleSheet.create({
 	},
 
 	postDescription: {
-		flex: 1,
 		flexDirection: "row",
 		justifyContent: "space-around",
 		alignItems: "center",
@@ -146,7 +144,6 @@ const styles = StyleSheet.create({
 	},
 
 	locationContainer: {
-		flex: 1,
 		flexDirection: "row",
 		marginLeft: "auto",
 		borderBottom: 1,
@@ -154,30 +151,20 @@ const styles = StyleSheet.create({
 		justifyContent: "flex-end",
 	},
 
-	profileBox: {
+	photoCont: {
+		backgroundColor: "red",
 		width: 60,
 		height: 60,
-		backgroundColor: "#F6F6F6",
+		marginRight: 8,
 		borderRadius: 16,
+		alignItems: "center",
+		justifyContent: "center",
 	},
-	profileDescrBox: {
-		// flex: 1,
-	},
-	profileDescr: {
-		fontSize: 16,
-		weight: "bold",
-	},
-	innerCont: {
-		// flex: 2,
-		// position: "absolute",
-		// minHeight: 100,
-
+	userCont: {
 		flexDirection: "row",
-		// padding: 20,
-		marginVertical: 32,
-		padding: 16,
+		alignItems: "center",
 	},
 	list: {
-		// marginTop: 60,
+		marginTop: 32,
 	},
 });
