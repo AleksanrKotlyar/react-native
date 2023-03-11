@@ -70,19 +70,25 @@ export default function CommentsScreen({ navigation, route }) {
 			<View>
 				<Image source={{ uri }} style={styles.poster} />
 			</View>
-			{/* <SafeAreaView style={styles.container}> */}
-			<FlatList
-				data={allComments}
-				renderItem={({ item }) => (
-					<View style={styles.commentContainer}>
-						<Text style={styles.commentAuthor}>{item.nickName}:</Text>
-						<Text style={styles.commentText}>{item.text}</Text>
-						<Text style={styles.commentText}>{item.date}</Text>
-					</View>
-				)}
-				keyExtractor={(item) => item.id}
-			/>
-			{/* </SafeAreaView> */}
+			<SafeAreaView style={styles.container}>
+				<FlatList
+					data={allComments}
+					renderItem={({ item }) => (
+						<View>
+							<View style={styles.commentContainer}>
+								<Text style={styles.commentAuthor}>{item.nickName}:</Text>
+								<Text style={{ fontSize: 16, paddingLeft: 4 }}>
+									{item.text}
+								</Text>
+								<Text style={{ fontSize: 10, marginLeft: "auto" }}>
+									{item.date}
+								</Text>
+							</View>
+						</View>
+					)}
+					keyExtractor={(item) => item.id}
+				/>
+			</SafeAreaView>
 			<View style={styles.inputContainer}>
 				<TextInput
 					style={styles.input}
@@ -136,9 +142,16 @@ const styles = StyleSheet.create({
 		borderColor: "#E8E8E8",
 		borderRadius: 8,
 	},
+	commentContainer: {
+		backgroundColor: "#BDBDBD",
+		borderRadius: 10,
+		marginBottom: 4,
+		paddingHorizontal: 6,
+	},
 	commentAuthor: {
 		fontSize: 18,
-
-		marginVertical: 8,
+		marginVertical: 6,
+		fontStyle: "italic",
+		fontWeight: "500",
 	},
 });

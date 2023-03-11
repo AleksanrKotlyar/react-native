@@ -116,16 +116,19 @@ export default function ProfileScreen({ navigation, route }) {
 
 										<TouchableOpacity
 											style={styles.locationContainer}
-											onPress={() =>
-												navigation.navigate("Map", {
-													location: item.location,
-												})
-											}
+											onPress={() => {
+												if (Object.keys(item.location).length > 0) {
+													navigation.navigate("Map", {
+														location: item.location,
+													});
+												}
+												return;
+											}}
 										>
 											<EvilIcons name="location" size={24} color="gray" />
-											<Text>
+											<Text style={{ textDecorationLine: "underline" }}>
 												{Object.keys(item.location).length > 0
-													? `${item.location.region}, ${item.location.country}`
+													? `${item.location.country}`
 													: "Местоположение не указано"}
 											</Text>
 										</TouchableOpacity>

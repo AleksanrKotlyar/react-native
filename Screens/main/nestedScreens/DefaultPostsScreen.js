@@ -97,7 +97,7 @@ export default function DefaultPostsScreen({ route, navigation }) {
 									}}
 								>
 									<EvilIcons name="location" size={24} color="gray" />
-									<Text>
+									<Text style={{ textDecorationLine: "underline" }}>
 										{Object.keys(item.location).length > 0
 											? `${item.location.region}, ${item.location.country}`
 											: "Местоположение не указано"}

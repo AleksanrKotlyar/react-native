@@ -228,10 +228,11 @@ export default function CreatePostsScreen({ navigation }) {
 				</TouchableOpacity>
 				<View style={style.clearBtnCont}>
 					<TouchableOpacity
-						onPress={() => {
-							setPhoto(null), setPostDescr(""), setLocatPos({});
+						onPress={cleanData}
+						style={{
+							...style.clearBtn,
+							backgroundColor: isReadyToPubl ? "#FF8c00" : "##BDBDBD",
 						}}
-						style={style.clearBtn}
 					>
 						<Feather name="trash-2" size={24} color="#BDBDBD" />
 					</TouchableOpacity>
@@ -312,7 +313,7 @@ const style = StyleSheet.create({
 		justifyContent: "flex-end",
 		alignItems: "center",
 		marginBottom: 32,
-		marginTop: 120,
+		marginTop: 100,
 	},
 	locatCont: {
 		flexDirection: "row",

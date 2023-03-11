@@ -52,17 +52,9 @@ export default function PostsScreen({ navigation, route }) {
 			<PostsStack.Screen
 				name="Comments"
 				component={CommentsScreen}
-				// options={{
-				// 	title: "Комментарии",
-				// 	headerLeft: () => (
-				// 		<AntDesign
-				// 			onPress={() => navigation.navigate("DefaultPosts")}
-				// 			name="arrowleft"
-				// 			size={24}
-				// 			color="black"
-				// 		/>
-				// 	),
-				// }}
+				options={{
+					title: "Комментарии",
+				}}
 			/>
 			<PostsStack.Screen name="Map" component={MapScreen} />
 		</PostsStack.Navigator>
