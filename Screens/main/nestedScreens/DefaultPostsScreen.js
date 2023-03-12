@@ -12,13 +12,7 @@ import { EvilIcons, Feather } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 
 import { db } from "../../../firebase/config";
-import {
-	collection,
-	getDocs,
-	setDoc,
-	doc,
-	onSnapshot,
-} from "firebase/firestore";
+import { collection, setDoc, doc, onSnapshot } from "firebase/firestore";
 
 export default function DefaultPostsScreen({ route, navigation }) {
 	const [posts, setPosts] = useState([]);
@@ -44,7 +38,16 @@ export default function DefaultPostsScreen({ route, navigation }) {
 		getAllPosts();
 	}, []);
 
-	// if (!posts) return;
+	const addLike = async (item) => {
+		const currArr = item.likes ? item.likes : [];
+		const likesArr = [...currArr, userId];
+		setDoc(doc(db, "posts", item.id), { likes: likesArr }, { merge: true });
+	};
+
+	const removeLike = async (item) => {
+		const likesArr = item.likes.filter((value) => value !== userId);
+		setDoc(doc(db, "posts", item.id), { likes: likesArr }, { merge: true });
+	};
 
 	return (
 		<View style={styles.container}>
@@ -100,7 +103,16 @@ export default function DefaultPostsScreen({ route, navigation }) {
 									<Feather
 										name="thumbs-up"
 										size={18}
-										color={item.likes?.length > 0 ? "#FF6C00" : "#BDBDBD"}
+										color={
+											item.likes?.some((value) => value === userId)
+												? "#FF6C00"
+												: "#BDBDBD"
+										}
+										onPress={() => {
+											item.likes?.some((value) => value === userId)
+												? removeLike(item)
+												: addLike(item);
+										}}
 									/>
 									<Text
 										style={{

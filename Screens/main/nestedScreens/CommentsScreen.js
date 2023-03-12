@@ -8,6 +8,7 @@ import {
 	Image,
 	SafeAreaView,
 	FlatList,
+	Keyboard,
 } from "react-native";
 
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
@@ -43,6 +44,7 @@ export default function CommentsScreen({ navigation, route }) {
 				{ merge: true }
 			);
 		}
+		Keyboard.dismiss;
 		setComment("");
 
 		// db.firestore()
@@ -73,6 +75,7 @@ export default function CommentsScreen({ navigation, route }) {
 			<SafeAreaView style={styles.container}>
 				<FlatList
 					data={allComments}
+					keyExtractor={(item, indx) => indx.toString()}
 					renderItem={({ item }) => (
 						<View>
 							<View style={styles.commentContainer}>
@@ -86,7 +89,6 @@ export default function CommentsScreen({ navigation, route }) {
 							</View>
 						</View>
 					)}
-					keyExtractor={(item) => item.id}
 				/>
 			</SafeAreaView>
 			<View style={styles.inputContainer}>
