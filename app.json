@@ -1,10 +1,11 @@
 {
 	"expo": {
-		"name": "myRNProject",
-		"slug": "myRNProject",
+		"name": "React native project",
+		"slug": "my-first-project",
+		"description": "My first react native app",
 		"version": "1.0.0",
 		"orientation": "default",
-		"icon": "./assets/icon.png",
+		"icon": "./assets/REACT-JS-KOCHI.png",
 		"userInterfaceStyle": "light",
 		"splash": {
 			"image": "./assets/splash.png",

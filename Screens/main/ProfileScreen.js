@@ -101,10 +101,10 @@ export default function ProfileScreen({ navigation, route }) {
 									<Text style={styles.postTitle}>{item.postDescription}</Text>
 
 									<View style={styles.postDescription}>
-										<EvilIcons
-											name="comment"
+										<Feather
+											name="message-circle"
 											size={24}
-											color="gray"
+											color={item.comments ? "#FF6C00" : "#BDBDBD"}
 											style={styles.commentIcon}
 											onPress={() =>
 												navigation.navigate("Comments", {
@@ -113,7 +113,33 @@ export default function ProfileScreen({ navigation, route }) {
 												})
 											}
 										/>
-
+										<View>
+											<Text
+												style={{
+													color: item.comments ? "black" : "#BDBDBD",
+													marginLeft: 6,
+													fontSize: 16,
+												}}
+											>
+												{item.comments ? item.comments.length : 0}
+											</Text>
+										</View>
+										<View style={{ marginLeft: 24, flexDirection: "row" }}>
+											<Feather
+												name="thumbs-up"
+												size={18}
+												color={item.likes?.length > 0 ? "#FF6C00" : "#BDBDBD"}
+											/>
+											<Text
+												style={{
+													marginLeft: 6,
+													color: item.likes?.length > 0 ? "black" : "#BDBDBD",
+													fontSize: 16,
+												}}
+											>
+												{item.likes?.length || 0}
+											</Text>
+										</View>
 										<TouchableOpacity
 											style={styles.locationContainer}
 											onPress={() => {

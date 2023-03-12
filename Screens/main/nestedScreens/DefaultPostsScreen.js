@@ -72,10 +72,10 @@ export default function DefaultPostsScreen({ route, navigation }) {
 							<Text style={styles.postTitle}>{item.postDescription}</Text>
 
 							<View style={styles.postDescription}>
-								<EvilIcons
-									name="comment"
+								<Feather
+									name="message-circle"
 									size={24}
-									color="gray"
+									color={item.comments ? "#FF6C00" : "#BDBDBD"}
 									style={styles.commentIcon}
 									onPress={() =>
 										navigation.navigate("Comments", {
@@ -84,6 +84,35 @@ export default function DefaultPostsScreen({ route, navigation }) {
 										})
 									}
 								/>
+
+								<View>
+									<Text
+										style={{
+											color: item.comments ? "black" : "#BDBDBD",
+											marginLeft: 6,
+											fontSize: 16,
+										}}
+									>
+										{item.comments?.le ? item.comments.length : 0}
+									</Text>
+								</View>
+								<View style={{ marginLeft: 24, flexDirection: "row" }}>
+									<Feather
+										name="thumbs-up"
+										size={18}
+										color={item.likes?.length > 0 ? "#FF6C00" : "#BDBDBD"}
+									/>
+									<Text
+										style={{
+											marginLeft: 6,
+											color: item.likes?.length > 0 ? "black" : "#BDBDBD",
+											fontSize: 16,
+										}}
+									>
+										{item.likes?.length || 0}
+									</Text>
+								</View>
+
 								<TouchableOpacity
 									style={styles.locationContainer}
 									onPress={() => {
@@ -139,7 +168,6 @@ const styles = StyleSheet.create({
 	},
 
 	commentIcon: {
-		marginRight: "auto",
 		marginVertical: 12,
 	},
 
