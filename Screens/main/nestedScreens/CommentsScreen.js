@@ -115,7 +115,7 @@ export default function CommentsScreen({ navigation, route }) {
 						<View style={styles.commentText}>
 							<Text
 								style={{
-									fontSize: 16,
+									fontSize: 14,
 									justifyContent: "flex-end",
 									fontFamily: "Roboto-Medium",
 								}}
@@ -127,6 +127,7 @@ export default function CommentsScreen({ navigation, route }) {
 									fontSize: 10,
 									marginLeft: "auto",
 									justifyContent: "flex-end",
+									color: "rgba(0, 0, 0, 0.4)",
 								}}
 							>
 								{item.date}
@@ -212,14 +213,14 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	commentAuthor: {
-		fontSize: 16,
+		fontSize: 14,
 		marginTop: 2,
 		fontStyle: "italic",
-		// fontWeight: "500",
+		fontWeight: "500",
 		fontFamily: "Roboto-Medium",
 	},
 	commentText: {
-		backgroundColor: "#BDBDBD",
+		backgroundColor: "rgba(0, 0, 0, 0.09)",
 		width: "90%",
 		minHeight: 30,
 		borderRadius: 10,
