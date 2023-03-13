@@ -1,4 +1,4 @@
-import db from "../../firebase/config";
+// import db from "../../firebase/config";
 import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
@@ -7,13 +7,16 @@ import {
 	onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
-
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase/config";
+import { uploadData } from "../../firebase/uploadStorage";
 import { authSlice } from "./authReducer";
 
-const { updateUserProfile, authStateChange, authSignOut } = authSlice.actions;
+const { updateUserProfile, authStateChange, authSignOut, changeAvatarPhoto } =
+	authSlice.actions;
 
 export const authSignUpUser =
-	({ email, password, login }) =>
+	({ email, password, login, photo }) =>
 	async (dispatch, getState) => {
 		// try {
 		// 	await db.auth().createUserWithEmailAndPassword(email, password);
@@ -37,17 +40,19 @@ export const authSignUpUser =
 				email,
 				password
 			);
-			// const avatarURL = await uploadPhoto(photo, user.uid);
-			// console.log("avatarURL: ", avatarURL);
 
-			await updateProfile(user, { displayName: login });
-			const { uid, displayName } = await auth.currentUser;
+			const avaURL = await uploadData(photo, user.uid);
+
+			await updateProfile(user, { displayName: login, photoURL: avaURL });
+			const { uid, displayName, photoURL } = await auth.currentUser;
+			console.log("displayNameREGISTER-------->", displayName);
 
 			dispatch(
 				updateUserProfile({
 					nickName: displayName,
 					userId: uid,
 					email,
+					avatarURL: photoURL,
 				})
 			);
 		} catch (error) {
@@ -70,16 +75,17 @@ export const authSignInUser =
 		try {
 			const { user } = await signInWithEmailAndPassword(auth, email, password);
 
-			const { uid, displayName } = user;
+			const { uid, displayName, photoURL } = user;
+			console.log("displayNameLOGIN-------->", displayName);
 
-			// dispatch(
-			// 	updateUserProfile({
-			// 		userId: uid,
-			// 		name: displayName,
-			// 		userEmail: email,
-			// 		avatURL: photoURL,
-			// 	})
-			// );
+			dispatch(
+				updateUserProfile({
+					userId: uid,
+					nickName: displayName,
+					email,
+					avatarURL: photoURL,
+				})
+			);
 		} catch (error) {
 			console.log("Sign up error", error),
 				console.log("sign up error.message", error.message);
@@ -105,14 +111,28 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 	// 	}
 	// });
 	await onAuthStateChanged(auth, (user) => {
+		console.log("uSER -------->", user);
 		if (user) {
 			const userUpdateProfile = {
 				nickName: user.displayName,
 				userId: user.uid,
 				email: user.email,
+				avatarURL: user.photoURL,
 			};
 			dispatch(updateUserProfile(userUpdateProfile));
 			dispatch(authStateChange({ stateChange: true }));
 		}
 	});
 };
+
+export const changeAvatarPhotoURL =
+	(photoUri) => async (dispatch, getState) => {
+		try {
+			const user = auth.currentUser;
+			const avaURL = photoUri ? await uploadData(photoUri, user.uid) : null;
+			await updateProfile(user, { photoURL: avaURL });
+			await dispatch(changeAvatarPhoto({ avatarURL: avaURL }));
+		} catch (error) {
+			console.log(error);
+		}
+	};

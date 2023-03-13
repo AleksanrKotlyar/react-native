@@ -16,6 +16,8 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { authSignUpUser } from "../../redux/auth/authOperations";
+import { Camera } from "expo-camera";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 
 const focusState = {
 	login: false,
@@ -24,7 +26,7 @@ const focusState = {
 };
 
 export default function RegistrationScreen({ navigation }) {
-	const { width } = useWindowDimensions();
+	const { width, height } = useWindowDimensions();
 
 	const dispatch = useDispatch();
 
@@ -32,11 +34,15 @@ export default function RegistrationScreen({ navigation }) {
 	const [login, setLogin] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [camera, setCamera] = useState(null);
+	const [photo, setPhoto] = useState(null);
+	const [isShowCamera, setIsShowCamera] = useState(false);
 	const [pswdVisible, setPswdVisible] = useState(true);
 	const [isOnFocus, setOnFocus] = useState(focusState);
 	const [dimWidth, setDimWidth] = useState(Dimensions.get("window").width);
 	const [dimHeight, setDimHeight] = useState(Dimensions.get("window").height);
 
+	const [permission, requestPermission] = Camera.useCameraPermissions();
 	useEffect(() => {
 		const onChange = () => {
 			const width = Dimensions.get("window").width;
@@ -55,13 +61,21 @@ export default function RegistrationScreen({ navigation }) {
 		setIsShowKeyboard(false);
 		Keyboard.dismiss();
 
-		dispatch(authSignUpUser({ login, email, password }));
+		dispatch(authSignUpUser({ login, email, password, photo }));
 		setLogin(""), setPassword(""), setEmail("");
 		setOnFocus(focusState);
 	};
 
 	const pswdVisToggle = () => {
 		setPswdVisible(!pswdVisible);
+	};
+
+	if (!permission?.granted) {
+		requestPermission();
+	}
+	const takeAvatarPhoto = async () => {
+		const photoSnap = await camera.takePictureAsync();
+		setPhoto(photoSnap.uri);
 	};
 
 	return (
@@ -88,13 +102,53 @@ export default function RegistrationScreen({ navigation }) {
 							style={{
 								...styles.imgAvatar,
 								marginHorizontal: (width - 120) / 2,
+								flexShrink: 1,
 							}}
 							position={"absolute"}
 						>
-							<Image
-								style={styles.addImgAvatar}
-								source={require("../../assets/icons/add.png")}
-							/>
+							{isShowCamera ? (
+								<Camera
+									style={styles.camera}
+									ref={setCamera}
+									type={Camera.Constants.Type.front}
+								>
+									<TouchableOpacity
+										onPress={async () => {
+											await takeAvatarPhoto();
+											await setIsShowCamera(false);
+										}}
+										style={styles.btnCont}
+									>
+										<MaterialIcons
+											name="photo-camera"
+											size={24}
+											color="#BDBDBD"
+										/>
+									</TouchableOpacity>
+								</Camera>
+							) : (
+								<Image
+									style={{ width: "100%", height: "100%", borderRadius: 16 }}
+									source={{ uri: photo }}
+								/>
+							)}
+
+							{!isShowCamera && photo === null && (
+								<TouchableOpacity
+									onPress={() => setIsShowCamera(true)}
+									style={styles.addImgAvatar}
+								>
+									<AntDesign name="pluscircleo" size={24} color="#FF6C00" />
+								</TouchableOpacity>
+							)}
+							{photo && (
+								<TouchableOpacity
+									onPress={() => setPhoto(null)}
+									style={styles.addImgAvatar}
+								>
+									<AntDesign name="closecircleo" size={24} color="#e8e8e8" />
+								</TouchableOpacity>
+							)}
 						</View>
 						<View style={styles.header}>
 							<Text style={styles.headerTitle}>Регистрация</Text>
@@ -282,5 +336,12 @@ const styles = StyleSheet.create({
 		fontFamily: "Roboto-Regular",
 		color: "#1B4371",
 		textAlign: "center",
+	},
+	camera: {
+		width: "100%",
+		height: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 16,
 	},
 });

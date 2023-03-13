@@ -10,6 +10,7 @@ import {
 	FlatList,
 	Keyboard,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase/config";
@@ -19,8 +20,9 @@ export default function CommentsScreen({ navigation, route }) {
 	const { postId } = route.params;
 	const [comment, setComment] = useState("");
 	const [allComments, setAllComments] = useState([]);
-	const { nickName } = useSelector((state) => state.auth);
+	const { nickName, avatarURL } = useSelector((state) => state.auth);
 	const { uri } = route.params;
+	const [InpBordColor, setInpBordColor] = useState("#E8E8E8");
 
 	useEffect(() => {
 		getAllPosts();
@@ -36,6 +38,7 @@ export default function CommentsScreen({ navigation, route }) {
 				text: comment,
 				date: commentDate,
 				nickName,
+				avatarURL,
 			};
 
 			await setDoc(
@@ -72,26 +75,68 @@ export default function CommentsScreen({ navigation, route }) {
 			<View>
 				<Image source={{ uri }} style={styles.poster} />
 			</View>
-			<SafeAreaView style={styles.container}>
-				<FlatList
-					data={allComments}
-					keyExtractor={(item, indx) => indx.toString()}
-					renderItem={({ item }) => (
-						<View>
-							<View style={styles.commentContainer}>
-								<Text style={styles.commentAuthor}>{item.nickName}:</Text>
-								<Text style={{ fontSize: 16, paddingLeft: 4 }}>
-									{item.text}
-								</Text>
-								<Text style={{ fontSize: 10, marginLeft: "auto" }}>
-									{item.date}
-								</Text>
-							</View>
+
+			<FlatList
+				data={allComments}
+				keyExtractor={(item, indx) => indx.toString()}
+				renderItem={({ item }) => (
+					<View
+						style={{
+							flex: 1,
+							flexDirection: "row",
+							// alignItems: "center",
+							marginTop: 6,
+						}}
+					>
+						<View
+							style={{
+								flexDirection: "column",
+								alignItems: "center",
+								maxWidth: 30,
+								marginRight: 4,
+							}}
+						>
+							{item.avatarURL && (
+								<Image
+									style={{
+										height: 28,
+										width: 28,
+										backgroundColor: "grey",
+										borderRadius: 14,
+									}}
+									source={{ uri: item.avatarURL }}
+								/>
+							)}
+
+							{!item.avatarURL && (
+								<Text style={styles.commentAuthor}>{item.nickName}</Text>
+							)}
 						</View>
-					)}
-				/>
-			</SafeAreaView>
-			<View style={styles.inputContainer}>
+						<View style={styles.commentText}>
+							<Text
+								style={{
+									fontSize: 16,
+									justifyContent: "flex-end",
+									fontFamily: "Roboto-Medium",
+								}}
+							>
+								{item.text}
+							</Text>
+							<Text
+								style={{
+									fontSize: 10,
+									marginLeft: "auto",
+									justifyContent: "flex-end",
+								}}
+							>
+								{item.date}
+							</Text>
+						</View>
+					</View>
+				)}
+			/>
+
+			{/* <View style={styles.inputContainer}>
 				<TextInput
 					style={styles.input}
 					onChangeText={setComment}
@@ -104,7 +149,21 @@ export default function CommentsScreen({ navigation, route }) {
 				activeOpacity={0.8}
 			>
 				<Text style={styles.buttonText}>Comment</Text>
-			</TouchableOpacity>
+			</TouchableOpacity> */}
+
+			<View style={{ ...styles.InpCont, borderColor: `${InpBordColor}` }}>
+				<TextInput
+					style={styles.textInput}
+					value={comment}
+					onChangeText={setComment}
+					placeholder="Комментировать..."
+					onFocus={() => setInpBordColor("#FF6C00")}
+					onBlur={() => setInpBordColor("#E8E8E8")}
+				/>
+				<TouchableOpacity onPress={createPost} style={styles.InpBtn}>
+					<AntDesign name="arrowup" size={14} color="white" />
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 }
@@ -143,17 +202,55 @@ const styles = StyleSheet.create({
 		height: 240,
 		borderColor: "#E8E8E8",
 		borderRadius: 8,
+		marginBottom: 16,
 	},
 	commentContainer: {
-		backgroundColor: "#BDBDBD",
 		borderRadius: 10,
 		marginBottom: 4,
-		paddingHorizontal: 6,
+		// paddingHorizontal: 6,
+		flexDirection: "row",
+		width: "100%",
 	},
 	commentAuthor: {
-		fontSize: 18,
-		marginVertical: 6,
+		fontSize: 16,
+		marginTop: 2,
 		fontStyle: "italic",
-		fontWeight: "500",
+		// fontWeight: "500",
+		fontFamily: "Roboto-Medium",
 	},
+	commentText: {
+		backgroundColor: "#BDBDBD",
+		width: "90%",
+		minHeight: 30,
+		borderRadius: 10,
+		flexDirection: "column",
+		// marginLeft: 4,
+
+		paddingHorizontal: 4,
+	},
+	InpCont: {
+		backgroundColor: "#f6f6f6",
+		minHeight: 50,
+		borderRadius: 100,
+		borderWidth: 1,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingLeft: 16,
+		paddingRight: 8,
+		// position: "absolute",
+		// bottom: 16,
+		marginVertical: 4,
+		width: "100%",
+	},
+	InpBtn: {
+		backgroundColor: "#FF6C00",
+		width: 34,
+		height: 34,
+		borderRadius: 17,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+
+	textInput: { fontFamily: "Roboto-Medium" },
 });

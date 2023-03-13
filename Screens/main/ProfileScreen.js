@@ -12,9 +12,19 @@ import {
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useSelector } from "react-redux";
-import { authSignOutUser } from "../../redux/auth/authOperations";
-import { EvilIcons, Feather, Entypo } from "@expo/vector-icons";
+import {
+	changeAvatarPhotoURL,
+	authSignOutUser,
+} from "../../redux/auth/authOperations";
+import {
+	EvilIcons,
+	Feather,
+	Entypo,
+	AntDesign,
+	MaterialIcons,
+} from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
+import { Camera } from "expo-camera";
 
 // import db from "../firebase/config";
 
@@ -22,8 +32,13 @@ export default function ProfileScreen({ navigation, route }) {
 	const width = Dimensions.get("window").width;
 	const dispatch = useDispatch();
 	const [userPosts, setUserPosts] = useState([]);
-	const { userId, nickName } = useSelector((state) => state.auth);
+	const [camera, setCamera] = useState(null);
+	const { userId, nickName, avatarURL } = useSelector((state) => state.auth);
 
+	const [photo, setPhoto] = useState(avatarURL);
+
+	const [isShowCamera, setIsShowCamera] = useState(false);
+	const [permission, requestPermission] = Camera.useCameraPermissions();
 	useEffect(() => {
 		getUserPosts();
 	}, []);
@@ -48,6 +63,20 @@ export default function ProfileScreen({ navigation, route }) {
 		// 	);
 	};
 
+	if (!permission?.granted) {
+		requestPermission();
+	}
+	const takeAvatarPhoto = async () => {
+		const photoSnap = await camera.takePictureAsync();
+		setPhoto(photoSnap.uri);
+		dispatch(changeAvatarPhotoURL(photoSnap.uri));
+		setIsShowCamera(false);
+	};
+
+	const changeAvatPhotoHandle = (photo) => {
+		dispatch(changeAvatarPhotoURL(photo));
+	};
+
 	return (
 		<View style={styles.container}>
 			<ImageBackground
@@ -62,10 +91,61 @@ export default function ProfileScreen({ navigation, route }) {
 						}}
 						position={"absolute"}
 					>
+						{/* {avatarURL && (
+							<Image
+								style={{ width: "100%", height: "100%", borderRadius: 16 }}
+								source={{ uri: avatarURL }}
+							/>
+						)}
 						<Image
 							style={styles.addImgAvatar}
 							source={require("../../assets/icons/add.png")}
-						/>
+						/> */}
+						{isShowCamera && (
+							<Camera
+								style={styles.camera}
+								ref={setCamera}
+								type={Camera.Constants.Type.front}
+							>
+								<TouchableOpacity
+									onPress={async () => {
+										await takeAvatarPhoto();
+										await setIsShowCamera(false);
+									}}
+									style={styles.btnCont}
+								>
+									<MaterialIcons
+										name="photo-camera"
+										size={24}
+										color="#BDBDBD"
+									/>
+								</TouchableOpacity>
+							</Camera>
+						)}
+
+						{avatarURL && (
+							<Image
+								style={{ width: "100%", height: "100%", borderRadius: 16 }}
+								source={{ uri: avatarURL }}
+							/>
+						)}
+
+						{!isShowCamera && avatarURL === null && (
+							<TouchableOpacity
+								onPress={() => setIsShowCamera(true)}
+								style={styles.addImgAvatar}
+							>
+								<AntDesign name="pluscircleo" size={24} color="#FF6C00" />
+							</TouchableOpacity>
+						)}
+						{avatarURL && (
+							<TouchableOpacity
+								onPress={() => changeAvatPhotoHandle(null)}
+								style={styles.addImgAvatar}
+							>
+								<AntDesign name="closecircleo" size={24} color="#e8e8e8" />
+							</TouchableOpacity>
+						)}
 					</View>
 
 					<Entypo
@@ -193,13 +273,14 @@ const styles = StyleSheet.create({
 		top: 81,
 		left: 107,
 	},
+
 	profileName: {
 		fontFamily: "Roboto-Bold",
 		fontSize: 30,
 		color: "#212121",
 	},
 	form: {
-		minHeight: 600,
+		minHeight: "80%",
 		backgroundColor: "#fff",
 		borderTopLeftRadius: 25,
 		borderTopRightRadius: 25,
@@ -246,5 +327,12 @@ const styles = StyleSheet.create({
 		borderBottom: 1,
 
 		justifyContent: "flex-end",
+	},
+	camera: {
+		width: "100%",
+		height: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 16,
 	},
 });

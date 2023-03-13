@@ -15,11 +15,16 @@ export const authSlice = createSlice({
 			userId: payload.userId,
 			nickName: payload.nickName,
 			email: payload.email,
+			avatarURL: payload.avatarURL,
 		}),
 		authStateChange: (state, { payload }) => ({
 			...state,
 			stateChange: payload.stateChange,
 		}),
 		authSignOut: () => state,
+		changeAvatarPhoto: (state, { payload }) => ({
+			...state,
+			avatarURL: payload.avatarURL,
+		}),
 	},
 });

@@ -15,9 +15,11 @@ import { db } from "../../../firebase/config";
 import { collection, setDoc, doc, onSnapshot } from "firebase/firestore";
 
 export default function DefaultPostsScreen({ route, navigation }) {
-	const [posts, setPosts] = useState([]);
+	const { nickName, email, userId, avatarURL } = useSelector(
+		(state) => state.auth
+	);
 
-	const { nickName, email, userId } = useSelector((state) => state.auth);
+	const [posts, setPosts] = useState([]);
 
 	const getAllPosts = async () => {
 		await onSnapshot(collection(db, "posts"), (querySnapshot) => {
@@ -56,7 +58,14 @@ export default function DefaultPostsScreen({ route, navigation }) {
 				onPress={() => navigation.navigate("Profile")}
 			>
 				<View style={styles.photoCont}>
-					<Feather name="user" size={44} color="black" />
+					{!avatarURL ? (
+						<Feather name="user" size={44} color="black" />
+					) : (
+						<Image
+							style={{ width: "100%", height: "100%", borderRadius: 16 }}
+							source={{ uri: avatarURL }}
+						/>
+					)}
 				</View>
 				<View>
 					<Text>{nickName}</Text>
@@ -96,7 +105,7 @@ export default function DefaultPostsScreen({ route, navigation }) {
 											fontSize: 16,
 										}}
 									>
-										{item.comments?.le ? item.comments.length : 0}
+										{item.comments?.length ? item.comments.length : 0}
 									</Text>
 								</View>
 								<View style={{ marginLeft: 24, flexDirection: "row" }}>
@@ -192,7 +201,7 @@ const styles = StyleSheet.create({
 	},
 
 	photoCont: {
-		backgroundColor: "red",
+		backgroundColor: "grey",
 		width: 60,
 		height: 60,
 		marginRight: 8,
