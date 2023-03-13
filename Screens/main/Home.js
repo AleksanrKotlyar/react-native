@@ -2,6 +2,10 @@ import { Text } from "react-native";
 import { Feather, AntDesig, Entypo } from "@expo/vector-icons";
 import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {
+	useRoute,
+	getFocusedRouteNameFromRoute,
+} from "@react-navigation/native";
 
 import ProfileScreen from "./ProfileScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
@@ -10,11 +14,8 @@ import PostsScreen from "./PostsScreen";
 const MainTabs = createBottomTabNavigator();
 
 export default function Home({ navigation, route }) {
-	// const dispatch = useDispatch();
-
 	return (
 		<MainTabs.Navigator
-			// initialRouteName="DefaultPosts"
 			screenOptions={{
 				headerTitleAlign: "center",
 				headerLeftContainerStyle: {
@@ -31,12 +32,19 @@ export default function Home({ navigation, route }) {
 		>
 			<MainTabs.Screen
 				screenOptions={{ borderTopWidth: 1 }}
-				options={{
+				options={({ route }) => ({
 					headerShown: false,
 					tabBarIcon: ({ focused, size, color }) => (
 						<Feather name="grid" size={24} color={color} />
 					),
-				}}
+					tabBarStyle: ((route) => {
+						const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+						if (routeName === "Comments") {
+							return { display: "none" };
+						}
+						return { height: 83 };
+					})(route),
+				})}
 				name="Posts"
 				component={PostsScreen}
 			/>
